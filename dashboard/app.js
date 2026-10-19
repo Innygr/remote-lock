@@ -27,27 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
     connectionDot.classList.toggle("online", Boolean(connected));
   }
   function setButtonsEnabled(enabled) {
-    refreshButton.addEventListener("click", async () => {
-    if (!token || busy) return;
-    busy = true;
-    setButtonsEnabled(false);
-    try {
-      await refreshDevices();
-      setMessage("Device status and recent activity refreshed.");
-    } catch (error) {
-      if (/Authentication required/i.test(error.message)) token = null;
-      setMessage(error.message, true);
-      if (!token) {
-        logoutButton.hidden = true;
-        setConnection("Session expired", false);
-      }
-    } finally {
-      busy = false;
-      setButtonsEnabled(Boolean(token));
-    }
-  });
-
-  document.querySelectorAll("[data-state]").forEach(button => {
+    document.querySelectorAll("[data-state]").forEach(button => {
       button.disabled = !enabled || busy;
     });
     refreshButton.disabled = !enabled || busy;
@@ -157,6 +137,26 @@ document.addEventListener("DOMContentLoaded", () => {
     } finally {
       busy = false;
       loginButton.disabled = false;
+      setButtonsEnabled(Boolean(token));
+    }
+  });
+
+  refreshButton.addEventListener("click", async () => {
+    if (!token || busy) return;
+    busy = true;
+    setButtonsEnabled(false);
+    try {
+      await refreshDevices();
+      setMessage("Device status and recent activity refreshed.");
+    } catch (error) {
+      if (/Authentication required/i.test(error.message)) token = null;
+      setMessage(error.message, true);
+      if (!token) {
+        logoutButton.hidden = true;
+        setConnection("Session expired", false);
+      }
+    } finally {
+      busy = false;
       setButtonsEnabled(Boolean(token));
     }
   });
