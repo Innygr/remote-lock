@@ -32,6 +32,7 @@ const freshState = () => ({
     PC: { desiredState: 'UNLOCKED', reportedState: 'UNKNOWN', connected: false, lastSeen: null },
     Server: { desiredState: 'UNLOCKED', reportedState: 'UNKNOWN', connected: false, lastSeen: null }
   },
+  audit: [],
   updatedAt: new Date().toISOString()
 });
 
@@ -45,6 +46,7 @@ try {
   state = freshState();
   await persist();
 }
+if (!Array.isArray(state.audit)) state.audit = [];
 function persist() {
   const temp = stateFile + '.' + process.pid + '.tmp';
   return fs.writeFile(temp, JSON.stringify(state, null, 2) + '\n', { mode: 0o600 })
@@ -111,6 +113,7 @@ function publicState() {
     schemaVersion: state.schemaVersion,
     devices: Object.fromEntries(Object.entries(state.devices).map(([id, d]) => [id, { ...d }])),
     updatedAt: state.updatedAt,
+    audit: state.audit.slice(-100),
     enforcement: 'DISABLED'
   };
 }
@@ -163,14 +166,22 @@ const server = http.createServer(async (req, res) => {
     if (req.method === 'GET' && url.pathname === '/api/devices') {
       return send(res, 200, publicState(), headers);
     }
+    if (req.method === 'GET' && url.pathname === '/api/audit') {
+      return send(res, 200, { entries: state.audit.slice(-100) }, headers);
+    }
     const match = url.pathname.match(/^\/api\/devices\/(PC|Server)\/state$/);
     if (req.method === 'POST' && match) {
       const body = await readBody(req);
       if (!['LOCKED', 'UNLOCKED'].includes(body.desiredState)) {
         return send(res, 400, { error: 'desiredState must be LOCKED or UNLOCKED' }, headers);
       }
+      const changedAt = new Date().toISOString();
       state.devices[match[1]].desiredState = body.desiredState;
-      state.updatedAt = new Date().toISOString();
+      state.devices[match[1]].requestedAt = changedAt;
+      state.devices[match[1]].requestedBy = session.username;
+      state.audit.push({ at: changedAt, actor: session.username, action: 'DESIRED_STATE_CHANGED', device: match[1], desiredState: body.desiredState });
+      if (state.audit.length > 500) state.audit.splice(0, state.audit.length - 500);
+      state.updatedAt = changedAt;
       await persist();
       return send(res, 202, {
         accepted: true,
