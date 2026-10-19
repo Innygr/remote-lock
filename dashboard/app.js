@@ -7,6 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const authMessage = document.getElementById("auth-message");
   const loginButton = document.getElementById("login-button");
   const logoutButton = document.getElementById("logout-button");
+  const refreshButton = document.getElementById("refresh-button");
   const connectionLabel = document.getElementById("connection-label");
   const connectionDot = document.getElementById("connection-dot");
   let token = null;
@@ -26,9 +27,30 @@ document.addEventListener("DOMContentLoaded", () => {
     connectionDot.classList.toggle("online", Boolean(connected));
   }
   function setButtonsEnabled(enabled) {
-    document.querySelectorAll("[data-state]").forEach(button => {
+    refreshButton.addEventListener("click", async () => {
+    if (!token || busy) return;
+    busy = true;
+    setButtonsEnabled(false);
+    try {
+      await refreshDevices();
+      setMessage("Device status and recent activity refreshed.");
+    } catch (error) {
+      if (/Authentication required/i.test(error.message)) token = null;
+      setMessage(error.message, true);
+      if (!token) {
+        logoutButton.hidden = true;
+        setConnection("Session expired", false);
+      }
+    } finally {
+      busy = false;
+      setButtonsEnabled(Boolean(token));
+    }
+  });
+
+  document.querySelectorAll("[data-state]").forEach(button => {
       button.disabled = !enabled || busy;
     });
+    refreshButton.disabled = !enabled || busy;
   }
   function formatDate(value) {
     if (!value) return "—";
