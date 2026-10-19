@@ -26,6 +26,10 @@ This service provides an authenticated control-plane API. It records requested s
 - `GET /api/audit` — last 100 state-change audit entries (authenticated).
 - `POST /api/devices/PC/state` or `/api/devices/Server/state` — JSON `{ "desiredState": "LOCKED" }` or `UNLOCKED`; saves intent only.
 - `POST /api/logout` — invalidates the bearer token.
+- `GET /agent/PC/desired` and `GET /agent/Server/desired` — device-token-authenticated desired-state polling.
+- `POST /agent/PC/report` and `POST /agent/Server/report` — device-token-authenticated reported-state updates.
+
+Each agent token is configured independently with `REMOTE_LOCK_AGENT_PC_TOKEN` and `REMOTE_LOCK_AGENT_SERVER_TOKEN`. Use different random secrets of at least 32 characters; never reuse the dashboard password or session token. An unconfigured agent endpoint returns `503`. Agent reports update connection metadata but do not perform enforcement.
 
 Tokens are held in server memory and expire after eight hours. The dashboard should keep its token in memory only, never localStorage or a URL. The server rejects browser origins other than the configured exact origin and uses timing-safe credential comparison plus basic login throttling.
 
