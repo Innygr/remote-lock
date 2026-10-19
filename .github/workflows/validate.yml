@@ -1,0 +1,26 @@
+name: Validate Remote Lock backend
+on:
+  push:
+    branches: [main]
+    paths:
+      - "server/**"
+      - ".github/workflows/validate.yml"
+  pull_request:
+    paths:
+      - "server/**"
+      - ".github/workflows/validate.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Check API syntax
+        run: node --check server/index.mjs
+      - name: Check package metadata
+        run: node -e "const p=require('./server/package.json'); if (!p.private || p.type !== 'module') process.exit(1); console.log('package metadata OK')"
