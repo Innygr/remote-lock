@@ -20,7 +20,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Check API syntax
-        run: node --check server/index.mjs
+      - name: Check backend and test syntax
+        run: npm --prefix server run check
       - name: Check package metadata
         run: node -e "const p=require('./server/package.json'); if (!p.private || p.type !== 'module') process.exit(1); console.log('package metadata OK')"
+      - name: Run API integration tests
+        run: npm --prefix server test
