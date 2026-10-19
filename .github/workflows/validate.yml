@@ -1,13 +1,15 @@
-name: Validate Remote Lock backend
+name: Validate Remote Lock backend and dashboard
 on:
   push:
     branches: [main]
     paths:
       - "server/**"
+      - "dashboard/**"
       - ".github/workflows/validate.yml"
   pull_request:
     paths:
       - "server/**"
+      - "dashboard/**"
       - ".github/workflows/validate.yml"
   workflow_dispatch:
 permissions:
@@ -22,6 +24,8 @@ jobs:
           node-version: 20
       - name: Check backend and test syntax
         run: npm --prefix server run check
+      - name: Check dashboard JavaScript syntax
+        run: node --check dashboard/app.js
       - name: Check package metadata
         run: node -e "const p=require('./server/package.json'); if (!p.private || p.type !== 'module') process.exit(1); console.log('package metadata OK')"
       - name: Run API integration tests
