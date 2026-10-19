@@ -8,6 +8,8 @@ import path from 'node:path';
 import fs from 'node:fs/promises';
 
 const password = 'test-only-password-0123456789-secure';
+const pcAgentToken = 'test-pc-agent-token-0123456789-abcdef';
+const serverAgentToken = 'test-server-agent-token-0123456789-abcdef';
 const origin = 'https://dashboard.example';
 
 async function freePort() {
@@ -29,7 +31,9 @@ async function startApi(stateFile, port) {
       REMOTE_LOCK_ALLOWED_ORIGIN: origin,
       REMOTE_LOCK_HOST: '127.0.0.1',
       REMOTE_LOCK_PORT: String(port),
-      REMOTE_LOCK_STATE_FILE: stateFile
+      REMOTE_LOCK_STATE_FILE: stateFile,
+      REMOTE_LOCK_AGENT_PC_TOKEN: pcAgentToken,
+      REMOTE_LOCK_AGENT_SERVER_TOKEN: serverAgentToken
     },
     stdio: ['ignore', 'pipe', 'pipe']
   });
@@ -91,6 +95,27 @@ test('private API protects state and persists desired state across restart', asy
   const noAuth = await fetch(running.base + '/api/devices');
   assert.equal(noAuth.status, 401);
 
+  const noAgentAuth = await fetch(running.base + '/agent/PC/desired');
+  assert.equal(noAgentAuth.status, 401);
+
+  const badAgentAuth = await fetch(running.base + '/agent/PC/desired', {
+    headers: { authorization: 'Bearer incorrect-agent-token' }
+  });
+  assert.equal(badAgentAuth.status, 401);
+
+  const agentDesired = await fetch(running.base + '/agent/PC/desired', {
+    headers: { authorization: 'Bearer ' + pcAgentToken }
+  });
+  assert.equal(agentDesired.status, 200);
+  assert.equal((await agentDesired.json()).enforcement, 'DISABLED');
+
+  const agentReport = await fetch(running.base + '/agent/PC/report', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', authorization: 'Bearer ' + pcAgentToken },
+    body: JSON.stringify({ reportedState: 'LOCKED' })
+  });
+  assert.equal(agentReport.status, 200);
+
   const token = await login(running.base);
   const unauthorizedChange = await fetch(running.base + '/api/devices/PC/state', {
     method: 'POST',
@@ -126,6 +151,7 @@ test('private API protects state and persists desired state across restart', asy
   assert.equal(persisted.devices.PC.desiredState, 'LOCKED');
   assert.equal(persisted.devices.Server.desiredState, 'UNLOCKED');
   assert.equal(persisted.devices.PC.requestedBy, 'Innygr');
+  assert.equal(persisted.devices.PC.reportedState, 'LOCKED');
   assert.equal(persisted.enforcement, 'DISABLED');
 
   const auditResponse = await fetch(running.base + '/api/audit', {
