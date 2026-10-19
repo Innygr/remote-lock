@@ -28,3 +28,13 @@ dl{margin:23px 0}dl div{display:flex;justify-content:space-between;gap:15px;padd
 .actions{display:flex;gap:10px}
 footer{display:flex;justify-content:space-between;gap:18px;padding:28px 0 40px;color:#74839a;font-size:11px}
 @media(max-width:700px){.device-grid{grid-template-columns:1fr}.intro{padding-top:30px}.topbar{align-items:flex-start}.connection{max-width:48%;text-align:right}.form-row{grid-template-columns:1fr}.auth-panel{padding:16px}footer{flex-direction:column;gap:5px}}
+.audit-panel{margin-top:20px;padding:20px;border:1px solid var(--line);border-radius:16px;background:#101a2a}
+.audit-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.audit-heading h2{font-size:16px;margin:0}.audit-heading p{font-size:12px;color:var(--muted);margin:4px 0 0}
+.audit-list{list-style:none;padding:0;margin:15px 0 0}
+.audit-item{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 0;border-bottom:1px solid #ffffff0d}
+.audit-item:last-child{border-bottom:0}
+.audit-main{display:flex;flex-direction:column;gap:3px;min-width:0}
+.audit-main strong{font-size:13px}.audit-main span,.audit-empty{font-size:12px;color:var(--muted)}
+.audit-badge{flex:0 0 auto;font-size:10px;font-weight:800;letter-spacing:.08em;color:#b9d5ff;background:#243956;border-radius:7px;padding:5px 7px}
+.audit-empty{padding:12px 0}
