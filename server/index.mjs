@@ -7,6 +7,10 @@ import { fileURLToPath } from 'node:url';
 const here = path.dirname(fileURLToPath(import.meta.url));
 const owner = process.env.REMOTE_LOCK_OWNER || 'Innygr';
 const password = process.env.REMOTE_LOCK_PASSWORD || '';
+const agentTokens = {
+  PC: process.env.REMOTE_LOCK_AGENT_PC_TOKEN || '',
+  Server: process.env.REMOTE_LOCK_AGENT_SERVER_TOKEN || ''
+};
 const allowedOrigin = (process.env.REMOTE_LOCK_ALLOWED_ORIGIN || '').replace(/\/$/, '');
 const host = process.env.REMOTE_LOCK_HOST || '127.0.0.1';
 const port = Number(process.env.REMOTE_LOCK_PORT || 8787);
@@ -151,6 +155,49 @@ const server = http.createServer(async (req, res) => {
       const token = crypto.randomBytes(32).toString('base64url');
       sessions.set(token, { username: owner, expiresAt: Date.now() + SESSION_TTL_MS });
       return send(res, 200, { token, username: owner, expiresInSeconds: SESSION_TTL_MS / 1000 }, headers);
+    }
+
+    const agentMatch = url.pathname.match(/^\/agent\/(PC|Server)\/(desired|report)$/);
+    if (agentMatch) {
+      const deviceId = agentMatch[1];
+      const action = agentMatch[2];
+      const configuredToken = agentTokens[deviceId];
+      const supplied = (req.headers.authorization || '').startsWith('Bearer ')
+        ? req.headers.authorization.slice(7) : '';
+      if (!configuredToken || configuredToken.length < 32) {
+        return send(res, 503, { error: 'This device agent is not configured on the server.' }, headers);
+      }
+      if (!safeEqual(supplied, configuredToken)) {
+        return send(res, 401, { error: 'Agent authentication required' }, headers);
+      }
+      if (req.method === 'GET' && action === 'desired') {
+        state.devices[deviceId].connected = true;
+        state.devices[deviceId].lastSeen = new Date().toISOString();
+        await persist();
+        return send(res, 200, {
+          device: deviceId,
+          desiredState: state.devices[deviceId].desiredState,
+          updatedAt: state.updatedAt,
+          enforcement: 'DISABLED'
+        }, headers);
+      }
+      if (req.method === 'POST' && action === 'report') {
+        const body = await readBody(req);
+        if (!['LOCKED', 'UNLOCKED', 'UNKNOWN'].includes(body.reportedState)) {
+          return send(res, 400, { error: 'reportedState must be LOCKED, UNLOCKED, or UNKNOWN' }, headers);
+        }
+        state.devices[deviceId].reportedState = body.reportedState;
+        state.devices[deviceId].connected = true;
+        state.devices[deviceId].lastSeen = new Date().toISOString();
+        await persist();
+        return send(res, 200, {
+          accepted: true,
+          device: deviceId,
+          reportedState: body.reportedState,
+          enforcement: 'DISABLED'
+        }, headers);
+      }
+      return send(res, 404, { error: 'Not found' }, headers);
     }
 
     const session = sessionFor(req);
