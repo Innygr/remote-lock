@@ -22,7 +22,8 @@ This service provides an authenticated control-plane API. It records requested s
 - `GET /health` — health check; reports enforcement disabled.
 - `POST /api/login` — JSON `{ "username": "Innygr", "password": "..." }`; returns a short-lived bearer token.
 - `GET /api/session` — current authenticated session.
-- `GET /api/devices` — persisted desired state and observed-state placeholders.
+- `GET /api/devices` — persisted desired state and observed-state placeholders, including recent audit history.
+- `GET /api/audit` — last 100 state-change audit entries (authenticated).
 - `POST /api/devices/PC/state` or `/api/devices/Server/state` — JSON `{ "desiredState": "LOCKED" }` or `UNLOCKED`; saves intent only.
 - `POST /api/logout` — invalidates the bearer token.
 
