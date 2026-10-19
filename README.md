@@ -4,17 +4,19 @@ Personal remote-lock dashboard and Windows companion project. The dashboard can 
 
 ## Project layout
 
-- `dashboard/` — static GitHub Pages frontend with sign-in UI.
-- `server/` — authenticated API and persistent desired-state storage.
-- `agent/` — planned Windows agent and per-session UI.
+- `dashboard/` — static GitHub Pages frontend with sign-in UI and recent activity.
+- `server/` — authenticated API, persistent desired-state storage, audit trail, and per-device agent endpoints.
+- `agent/` — transparent foreground polling prototype; no lock enforcement yet.
 - `service/` — planned Windows background service.
 - `installer/` — planned Windows packaging and installation scripts.
 
 ## Architecture
 
-GitHub Pages serves only the dashboard; it cannot run the API or lock Windows devices itself. The dashboard talks to the API over HTTPS through a private Tailscale Serve endpoint. The API binds to `127.0.0.1` by default; do not port-forward it or expose it directly to the public internet. The frontend password is sent only to the configured API and is not saved by the page.
+GitHub Pages serves only the dashboard; it cannot run the API or lock Windows devices itself. The dashboard talks to the API over HTTPS through a private Tailscale Serve endpoint. The API binds to `127.0.0.1` by default; do not port-forward it or expose it directly to the public internet.
 
-The API authenticates the owner, rejects unapproved browser origins, creates short-lived in-memory bearer sessions, and persists desired state for the fixed targets `PC` and `Server`. It deliberately reports `enforcement: DISABLED`: it saves intent only and does not lock or unlock Windows. See `server/README.md` for setup details.
+The API authenticates the owner, rejects unapproved browser origins, creates short-lived in-memory dashboard sessions, and persists desired state for the fixed targets `PC` and `Server`. It records a bounded audit history for state requests. Agents use separate per-device tokens rather than dashboard credentials. Device online indicators expire if no heartbeat has been seen for 90 seconds.
+
+The API and poller deliberately report `enforcement: DISABLED` or `reportedState: UNKNOWN`: they save intent and demonstrate authenticated communication but do not lock or unlock Windows. See `server/README.md` and `agent/README.md` for setup details.
 
 ## Security requirements
 
@@ -30,6 +32,6 @@ The API authenticates the owner, rejects unapproved browser origins, creates sho
 
 ## Current status
 
-Implemented: dashboard sign-in UI, password-authenticated API, short-lived sessions, basic login throttling, fixed PC/Server desired-state persistence, logout, strict configured CORS origin, and backend syntax-check workflow.
+Implemented: dashboard sign-in UI and activity panel, password-authenticated API, short-lived sessions, basic login throttling, fixed PC/Server desired-state persistence, bounded audit history, per-device authenticated desired-state/report endpoints, a foreground polling prototype, and automated API/JavaScript checks.
 
-Not implemented: Windows agent/service, real lock enforcement, agent identity/reporting, audit trail, installer, and production security review. The Lock/Unlock buttons currently save desired state only. Do not treat them as actual device controls.
+Not implemented: actual Windows lock-screen UI, enforcement, production agent identity/replay protection, comprehensive audit retention, installer, and production security review. The Lock/Unlock buttons currently save desired state only. Agent reports are not proof of a locked desktop.
