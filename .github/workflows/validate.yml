@@ -5,6 +5,7 @@ on:
     paths:
       - "server/**"
       - "dashboard/**"
+      - "agent/**"
       - ".github/workflows/validate.yml"
   pull_request:
     paths:
@@ -26,6 +27,8 @@ jobs:
         run: npm --prefix server run check
       - name: Check dashboard JavaScript syntax
         run: node --check dashboard/app.js
+      - name: Check agent JavaScript syntax
+        run: node --check agent/poller.mjs
       - name: Check package metadata
         run: node -e "const p=require('./server/package.json'); if (!p.private || p.type !== 'module') process.exit(1); console.log('package metadata OK')"
       - name: Run API integration tests
