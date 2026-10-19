@@ -7,7 +7,6 @@ on:
       - "dashboard/**"
       - "agent/**"
       - ".github/workflows/validate.yml"
-      - ".github/workflows/validate.yml"
   pull_request:
     paths:
       - "server/**"
