@@ -36,6 +36,15 @@ jobs:
           dotnet-version: 8.0.x
       - name: Build Windows overlay agent
         run: dotnet build agent/windows-ui/RemoteLock.Agent.csproj --configuration Release
+      - name: Publish portable Windows x64 agent bundle
+        run: dotnet publish agent/windows-ui/RemoteLock.Agent.csproj --configuration Release --runtime win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o artifacts/remote-lock-agent-win-x64
+      - name: Upload Windows agent build
+        uses: actions/upload-artifact@v4
+        with:
+          name: remote-lock-agent-win-x64
+          path: artifacts/remote-lock-agent-win-x64/
+          if-no-files-found: error
+          retention-days: 14
       - name: Check package metadata
         run: node -e "const p=require('./server/package.json'); if (!p.private || p.type !== 'module') process.exit(1); console.log('package metadata OK')"
       - name: Run API integration tests
