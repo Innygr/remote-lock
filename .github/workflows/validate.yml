@@ -11,6 +11,7 @@ on:
     paths:
       - "server/**"
       - "dashboard/**"
+      - "agent/**"
       - ".github/workflows/validate.yml"
   workflow_dispatch:
 permissions:
