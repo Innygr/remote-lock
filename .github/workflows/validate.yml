@@ -7,6 +7,7 @@ on:
       - "dashboard/**"
       - "agent/**"
       - ".github/workflows/validate.yml"
+      - ".github/workflows/validate.yml"
   pull_request:
     paths:
       - "server/**"
@@ -30,6 +31,12 @@ jobs:
         run: node --check dashboard/app.js
       - name: Check agent JavaScript syntax
         run: node --check agent/poller.mjs
+      - name: Set up .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - name: Build Windows overlay agent
+        run: dotnet build agent/windows-ui/RemoteLock.Agent.csproj --configuration Release
       - name: Check package metadata
         run: node -e "const p=require('./server/package.json'); if (!p.private || p.type !== 'module') process.exit(1); console.log('package metadata OK')"
       - name: Run API integration tests
