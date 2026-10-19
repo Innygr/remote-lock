@@ -5,5 +5,9 @@
   "type": "module",
   "description": "Authenticated private control-plane API for Remote Lock",
   "engines": { "node": ">=20" },
-  "scripts": { "start": "node index.mjs", "check": "node --check index.mjs" }
+  "scripts": {
+    "start": "node index.mjs",
+    "check": "node --check index.mjs && node --check api.test.mjs",
+    "test": "node --test api.test.mjs"
+  }
 }
