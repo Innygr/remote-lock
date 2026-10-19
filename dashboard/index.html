@@ -63,7 +63,7 @@
         <div class="actions"><button type="button" data-state="LOCKED" disabled>Request lock</button><button type="button" class="secondary" data-state="UNLOCKED" disabled>Request unlock</button></div>
       </article>
     </section>
-    <section class="audit-panel" aria-labelledby="audit-heading"><div class="audit-heading"><div><h2 id="audit-heading">Recent activity</h2><p>Audit trail of saved requests. This is not proof a device is locked.</p></div><span class="status-pill">Latest 10</span></div><ol id="audit-list" class="audit-list"><li class="audit-empty">Sign in to load activity.</li></ol></section>
+    <section class="audit-panel" aria-labelledby="audit-heading"><div class="audit-heading"><div><h2 id="audit-heading">Recent activity</h2><p>Audit trail of saved requests. This is not proof a device is locked.</p></div><div class="actions"><span class="status-pill">Latest 10</span><button type="button" id="refresh-button" class="secondary compact" disabled>Refresh status</button></div></div><ol id="audit-list" class="audit-list"><li class="audit-empty">Sign in to load activity.</li></ol></section>
     <footer><span>Remote Lock · Early development</span><span>Authenticated state storage only; Windows agents are not connected.</span></footer>
   </main>
 </body>
