@@ -115,7 +115,10 @@ function sessionFor(req) {
 function publicState() {
   return {
     schemaVersion: state.schemaVersion,
-    devices: Object.fromEntries(Object.entries(state.devices).map(([id, d]) => [id, { ...d }])),
+    devices: Object.fromEntries(Object.entries(state.devices).map(([id, d]) => [id, {
+      ...d,
+      connected: Boolean(d.lastSeen && Number.isFinite(Date.parse(d.lastSeen)) && Date.now() - Date.parse(d.lastSeen) < 90_000)
+    }])),
     updatedAt: state.updatedAt,
     audit: state.audit.slice(-100),
     enforcement: 'DISABLED'
