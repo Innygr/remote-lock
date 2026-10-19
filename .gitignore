@@ -1,0 +1,6 @@
+.env
+.env.*
+!.env.example
+server/data/
+server/node_modules/
+*.log
