@@ -125,5 +125,15 @@ test('private API protects state and persists desired state across restart', asy
   const persisted = await stateResponse.json();
   assert.equal(persisted.devices.PC.desiredState, 'LOCKED');
   assert.equal(persisted.devices.Server.desiredState, 'UNLOCKED');
+  assert.equal(persisted.devices.PC.requestedBy, 'Innygr');
   assert.equal(persisted.enforcement, 'DISABLED');
+
+  const auditResponse = await fetch(running.base + '/api/audit', {
+    headers: { origin, authorization: 'Bearer ' + tokenAfterRestart }
+  });
+  assert.equal(auditResponse.status, 200);
+  const audit = await auditResponse.json();
+  assert.equal(audit.entries.at(-1).action, 'DESIRED_STATE_CHANGED');
+  assert.equal(audit.entries.at(-1).device, 'PC');
+  assert.equal(audit.entries.at(-1).desiredState, 'LOCKED');
 });
