@@ -36,6 +36,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return Number.isNaN(date.getTime()) ? "—" : date.toLocaleString();
   }
   function renderDevices(payload) {
+    renderAudit(payload.audit || []);
     for (const id of ["PC", "Server"]) {
       const device = payload.devices && payload.devices[id];
       const card = document.querySelector('[data-device="' + id + '"]');
@@ -45,6 +46,34 @@ document.addEventListener("DOMContentLoaded", () => {
       card.querySelector('[data-field="desired"]').textContent = device.desiredState || "Unknown";
       card.querySelector('[data-field="reported"]').textContent = device.reportedState || "Unknown";
       card.querySelector('[data-field="last-seen"]').textContent = formatDate(device.lastSeen);
+    }
+  }
+  function renderAudit(entries) {
+    const list = document.getElementById("audit-list");
+    list.replaceChildren();
+    const recent = entries.slice(-10).reverse();
+    if (!recent.length) {
+      const item = document.createElement("li");
+      item.className = "audit-empty";
+      item.textContent = "No saved state requests yet.";
+      list.append(item);
+      return;
+    }
+    for (const entry of recent) {
+      const item = document.createElement("li");
+      item.className = "audit-item";
+      const main = document.createElement("div");
+      main.className = "audit-main";
+      const title = document.createElement("strong");
+      title.textContent = (entry.device || "Device") + " · " + (entry.desiredState || "Unknown");
+      const detail = document.createElement("span");
+      detail.textContent = (entry.actor || "Unknown user") + " requested state · " + formatDate(entry.at);
+      main.append(title, detail);
+      const badge = document.createElement("span");
+      badge.className = "audit-badge";
+      badge.textContent = "REQUESTED";
+      item.append(main, badge);
+      list.append(item);
     }
   }
   async function api(path, options = {}) {
