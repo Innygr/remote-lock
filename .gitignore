@@ -3,4 +3,10 @@
 !.env.example
 server/data/
 server/node_modules/
+**/node_modules/
+**/bin/
+**/obj/
 *.log
+*.tmp
+.DS_Store
+Thumbs.db
