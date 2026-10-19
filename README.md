@@ -6,7 +6,7 @@ Personal remote-lock dashboard and Windows companion project. The dashboard can 
 
 - `dashboard/` — static GitHub Pages frontend with sign-in UI and recent activity.
 - `server/` — authenticated API, persistent desired-state storage, audit trail, and per-device agent endpoints.
-- `agent/` — transparent foreground polling prototype; no lock enforcement yet.
+- `agent/` — transparent foreground polling prototype and visible WinForms overlay UI; no Windows secure lock enforcement.
 - `service/` — planned Windows background service.
 - `installer/` — planned Windows packaging and installation scripts.
 
@@ -34,4 +34,4 @@ The API and poller deliberately report `enforcement: DISABLED` or `reportedState
 
 Implemented: dashboard sign-in UI and activity panel, password-authenticated API, short-lived sessions, basic login throttling, fixed PC/Server desired-state persistence, bounded audit history, per-device authenticated desired-state/report endpoints, a foreground polling prototype, and automated API/JavaScript checks.
 
-Not implemented: actual Windows lock-screen UI, enforcement, production agent identity/replay protection, comprehensive audit retention, installer, and production security review. The Lock/Unlock buttons currently save desired state only. Agent reports are not proof of a locked desktop.
+Not implemented: Windows secure lock enforcement, production agent identity/replay protection, comprehensive audit retention, installer, and production security review. The WinForms overlay is a visible, bypassable desktop window—not the Windows sign-in screen. The Lock/Unlock buttons currently save desired state only. Agent reports are not proof of a locked desktop.
