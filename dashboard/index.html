@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#101827">
+  <title>Remote Lock</title>
+  <link rel="stylesheet" href="./styles.css">
+  <script src="./app.js" defer></script>
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <a class="brand" href="./"><span class="brand-mark" aria-hidden="true">RL</span><span>Remote Lock</span></a>
+      <div class="connection"><span class="dot"></span><span id="connection-label">Backend not configured</span></div>
+    </header>
+    <section class="intro">
+      <p class="eyebrow">PERSONAL DEVICE CONTROL</p>
+      <h1>Devices</h1>
+      <p class="subhead">Check connectivity and desired lock state.</p>
+    </section>
+    <section class="notice" role="status" id="setup-notice">
+      <strong>Dashboard scaffold</strong>
+      <p>This is only the interface. Configure and secure the private backend before enabling commands. This starter page sends no lock commands.</p>
+    </section>
+    <section class="device-grid" aria-label="Managed devices">
+      <article class="device-card" data-device="PC">
+        <div class="card-head"><div class="device-icon" aria-hidden="true">▣</div><div><h2>My PC</h2><p class="device-id">Target: PC</p></div><span class="status-pill">Unknown</span></div>
+        <dl><div><dt>Connection</dt><dd>Not connected</dd></div><div><dt>Desired state</dt><dd>Unknown</dd></div><div><dt>Reported state</dt><dd>Unknown</dd></div><div><dt>Last seen</dt><dd>—</dd></div></dl>
+        <div class="actions"><button type="button" disabled>Lock</button><button type="button" class="secondary" disabled>Unlock</button></div>
+      </article>
+      <article class="device-card" data-device="Server">
+        <div class="card-head"><div class="device-icon" aria-hidden="true">▤</div><div><h2>My Server</h2><p class="device-id">Target: Server</p></div><span class="status-pill">Unknown</span></div>
+        <dl><div><dt>Connection</dt><dd>Not connected</dd></div><div><dt>Desired state</dt><dd>Unknown</dd></div><div><dt>Reported state</dt><dd>Unknown</dd></div><div><dt>Last seen</dt><dd>—</dd></div></dl>
+        <div class="actions"><button type="button" disabled>Lock</button><button type="button" class="secondary" disabled>Unlock</button></div>
+      </article>
+    </section>
+    <footer><span>Remote Lock · Early scaffold</span><span>Controls disabled until a secure backend is configured.</span></footer>
+  </main>
+</body>
+</html>
