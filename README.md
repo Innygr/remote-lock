@@ -9,6 +9,7 @@ Personal remote-lock dashboard and Windows companion project. The dashboard can 
 - `agent/` — transparent foreground polling prototype and visible WinForms overlay UI; no Windows secure lock enforcement.
 - `service/` — planned Windows background service.
 - `installer/` — planned Windows packaging and installation scripts.
+- `docs/deployment-checklist.md` — private-host and Tailscale deployment checklist.
 
 ## Architecture
 
@@ -16,7 +17,7 @@ GitHub Pages serves only the dashboard; it cannot run the API or lock Windows de
 
 The API authenticates the owner, rejects unapproved browser origins, creates short-lived in-memory dashboard sessions, and persists desired state for the fixed targets `PC` and `Server`. It records a bounded audit history for state requests. Agents use separate per-device tokens rather than dashboard credentials. Device online indicators expire if no heartbeat has been seen for 90 seconds.
 
-The API and poller deliberately report `enforcement: DISABLED` or `reportedState: UNKNOWN`: they save intent and demonstrate authenticated communication but do not lock or unlock Windows. See `server/README.md` and `agent/README.md` for setup details.
+The API and poller deliberately report `enforcement: DISABLED` or `reportedState: UNKNOWN`: they save intent and demonstrate authenticated communication but do not lock or unlock Windows. See `server/README.md`, `agent/README.md`, and the [deployment checklist](docs/deployment-checklist.md).
 
 ## Security requirements
 
@@ -32,6 +33,6 @@ The API and poller deliberately report `enforcement: DISABLED` or `reportedState
 
 ## Current status
 
-Implemented: dashboard sign-in UI and activity panel, password-authenticated API, short-lived sessions, basic login throttling, fixed PC/Server desired-state persistence, bounded audit history, per-device authenticated desired-state/report endpoints, a foreground polling prototype, and automated API/JavaScript checks.
+Implemented: dashboard sign-in UI and activity panel, password-authenticated API, short-lived sessions, basic login throttling, fixed PC/Server desired-state persistence, bounded audit history, per-device authenticated desired-state/report endpoints, a foreground polling prototype, visible WinForms overlay, and CI checks for API tests, JavaScript syntax, and a .NET build.
 
 Not implemented: Windows secure lock enforcement, production agent identity/replay protection, comprehensive audit retention, installer, and production security review. The WinForms overlay is a visible, bypassable desktop window—not the Windows sign-in screen. The Lock/Unlock buttons currently save desired state only. Agent reports are not proof of a locked desktop.
