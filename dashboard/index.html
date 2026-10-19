@@ -7,36 +7,63 @@
   <meta name="theme-color" content="#101827">
   <title>Remote Lock</title>
   <link rel="stylesheet" href="./styles.css">
+  <script src="./config.js"></script>
   <script src="./app.js" defer></script>
 </head>
 <body>
   <main class="shell">
     <header class="topbar">
       <a class="brand" href="./"><span class="brand-mark" aria-hidden="true">RL</span><span>Remote Lock</span></a>
-      <div class="connection"><span class="dot"></span><span id="connection-label">Backend not configured</span></div>
+      <div class="connection"><span class="dot" id="connection-dot"></span><span id="connection-label">Not connected</span></div>
     </header>
     <section class="intro">
       <p class="eyebrow">PERSONAL DEVICE CONTROL</p>
       <h1>Devices</h1>
-      <p class="subhead">Check connectivity and desired lock state.</p>
+      <p class="subhead">Private control plane for your PC and Server.</p>
     </section>
-    <section class="notice" role="status" id="setup-notice">
-      <strong>Dashboard scaffold</strong>
-      <p>This is only the interface. Configure and secure the private backend before enabling commands. This starter page sends no lock commands.</p>
+    <section class="notice" role="status" id="setup-notice" aria-live="polite">
+      <strong>Early development — no real lock enforcement</strong>
+      <p>Requests currently save the desired state only. They do not lock or unlock Windows. Keep the API private and configure a tested recovery path before enabling any enforcement.</p>
+    </section>
+    <section class="auth-panel" aria-labelledby="auth-heading">
+      <div class="auth-heading">
+        <div><h2 id="auth-heading">Private API connection</h2><p>Sign in to your own API through your private network.</p></div>
+        <button type="button" id="logout-button" class="secondary compact" hidden>Sign out</button>
+      </div>
+      <form id="login-form">
+        <label for="api-base">Private API HTTPS address</label>
+        <input id="api-base" name="api-base" type="url" inputmode="url" placeholder="https://your-device.your-tailnet.ts.net" autocomplete="url" required>
+        <div class="form-row">
+          <div><label for="username">Username</label><input id="username" name="username" value="Innygr" autocomplete="username" required></div>
+          <div><label for="password">API password</label><input id="password" name="password" type="password" autocomplete="current-password" required></div>
+        </div>
+        <button id="login-button" type="submit">Connect securely</button>
+        <p id="auth-message" class="form-message" role="status" aria-live="polite">The API address is not a secret; the password is never saved by this page.</p>
+      </form>
     </section>
     <section class="device-grid" aria-label="Managed devices">
       <article class="device-card" data-device="PC">
-        <div class="card-head"><div class="device-icon" aria-hidden="true">▣</div><div><h2>My PC</h2><p class="device-id">Target: PC</p></div><span class="status-pill">Unknown</span></div>
-        <dl><div><dt>Connection</dt><dd>Not connected</dd></div><div><dt>Desired state</dt><dd>Unknown</dd></div><div><dt>Reported state</dt><dd>Unknown</dd></div><div><dt>Last seen</dt><dd>—</dd></div></dl>
-        <div class="actions"><button type="button" disabled>Lock</button><button type="button" class="secondary" disabled>Unlock</button></div>
+        <div class="card-head"><div class="device-icon" aria-hidden="true">▣</div><div><h2>My PC</h2><p class="device-id">Target: PC</p></div><span class="status-pill" data-field="connection">Offline</span></div>
+        <dl>
+          <div><dt>Connection</dt><dd data-field="connection-text">Unknown</dd></div>
+          <div><dt>Desired state</dt><dd data-field="desired">Unknown</dd></div>
+          <div><dt>Reported state</dt><dd data-field="reported">Unknown</dd></div>
+          <div><dt>Last seen</dt><dd data-field="last-seen">—</dd></div>
+        </dl>
+        <div class="actions"><button type="button" data-state="LOCKED" disabled>Request lock</button><button type="button" class="secondary" data-state="UNLOCKED" disabled>Request unlock</button></div>
       </article>
       <article class="device-card" data-device="Server">
-        <div class="card-head"><div class="device-icon" aria-hidden="true">▤</div><div><h2>My Server</h2><p class="device-id">Target: Server</p></div><span class="status-pill">Unknown</span></div>
-        <dl><div><dt>Connection</dt><dd>Not connected</dd></div><div><dt>Desired state</dt><dd>Unknown</dd></div><div><dt>Reported state</dt><dd>Unknown</dd></div><div><dt>Last seen</dt><dd>—</dd></div></dl>
-        <div class="actions"><button type="button" disabled>Lock</button><button type="button" class="secondary" disabled>Unlock</button></div>
+        <div class="card-head"><div class="device-icon" aria-hidden="true">▤</div><div><h2>My Server</h2><p class="device-id">Target: Server</p></div><span class="status-pill" data-field="connection">Offline</span></div>
+        <dl>
+          <div><dt>Connection</dt><dd data-field="connection-text">Unknown</dd></div>
+          <div><dt>Desired state</dt><dd data-field="desired">Unknown</dd></div>
+          <div><dt>Reported state</dt><dd data-field="reported">Unknown</dd></div>
+          <div><dt>Last seen</dt><dd data-field="last-seen">—</dd></div>
+        </dl>
+        <div class="actions"><button type="button" data-state="LOCKED" disabled>Request lock</button><button type="button" class="secondary" data-state="UNLOCKED" disabled>Request unlock</button></div>
       </article>
     </section>
-    <footer><span>Remote Lock · Early scaffold</span><span>Controls disabled until a secure backend is configured.</span></footer>
+    <footer><span>Remote Lock · Early development</span><span>Authenticated state storage only; Windows agents are not connected.</span></footer>
   </main>
 </body>
 </html>
